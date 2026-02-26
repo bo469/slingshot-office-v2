@@ -181,12 +181,13 @@ export class GatewayWsClient {
       minProtocol: 1,
       maxProtocol: 3,
       client: {
-        id: "webchat-ui",
+        id: "openclaw-control-ui",
         version: "0.1.0",
         platform: "web",
         mode: "ui",
       },
       caps: ["tool-events"],
+      scopes: ["operator.admin"],
     };
 
     if (this.token) {

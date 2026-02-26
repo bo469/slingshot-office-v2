@@ -64,15 +64,46 @@ pnpm dev
 
 ### 配置
 
-复制 `.env.example` 为 `.env`，填入你的 Gateway 地址：
+#### 基础配置
+
+创建 `.env.local` 文件（已在 `.gitignore` 中，不会被提交），填入 Gateway 地址和认证 token：
 
 ```bash
-cp .env.example .env
+cat > .env.local << 'EOF'
+VITE_GATEWAY_URL=ws://localhost:18789
+VITE_GATEWAY_TOKEN=<你的 gateway token>
+EOF
 ```
 
+Gateway token 可通过以下命令获取：
+
+```bash
+openclaw config get gateway.auth.token
 ```
-VITE_GATEWAY_URL=ws://localhost:18789
+
+#### Gateway 认证配置
+
+OpenClaw Office 是纯 Web 应用，连接 Gateway 时以 `openclaw-control-ui` 身份认证。Gateway 2026.2.15+ 要求签名的 device identity 来授予 operator scopes，而浏览器中无法提供 Ed25519 device identity。
+
+**要启用 Chat 等写操作功能，必须配置 Gateway 允许 bypass device auth：**
+
+```bash
+openclaw config set gateway.controlUi.dangerouslyDisableDeviceAuth true
 ```
+
+配置后需重启 Gateway。
+
+> **注意：** 此配置仅建议在本地开发环境使用。生产环境应通过反向代理或其他安全机制处理认证。
+
+#### 环境变量说明
+
+| 变量 | 必须 | 默认值 | 说明 |
+|------|------|--------|------|
+| `VITE_GATEWAY_URL` | 否 | `ws://localhost:18789` | Gateway WebSocket 地址 |
+| `VITE_GATEWAY_TOKEN` | 是（连接真实 Gateway 时） | 空 | Gateway 认证 token |
+| `VITE_MOCK` | 否 | `false` | 启用 Mock 模式（不连接 Gateway） |
+
+#### Mock 模式
 
 如需在没有 Gateway 的情况下开发，启用 Mock 模式：
 

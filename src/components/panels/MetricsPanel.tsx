@@ -60,13 +60,13 @@ export function MetricsPanel() {
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-2 gap-1.5 p-2">
+      <div className="grid grid-cols-4 gap-1 p-2">
         {cards.map((card) => (
-          <div key={card.label} className="rounded-lg bg-gray-50 px-2 py-1 text-center dark:bg-gray-800">
-            <div className="text-base font-bold leading-tight" style={{ color: card.color }}>
+          <div key={card.label} className="rounded-lg bg-gray-50 px-1 py-1 text-center dark:bg-gray-800">
+            <div className="text-xs font-bold leading-tight" style={{ color: card.color }}>
               {card.value}
             </div>
-            <div className="text-[9px] text-gray-500 dark:text-gray-400">{card.label}</div>
+            <div className="text-[8px] text-gray-500 dark:text-gray-400">{card.label}</div>
           </div>
         ))}
       </div>

@@ -1,14 +1,18 @@
 import { useEffect, type ReactNode, type RefObject } from "react";
+import { Outlet } from "react-router-dom";
 import { AgentContextMenu } from "@/components/overlays/AgentContextMenu";
 import { ForceActionDialog } from "@/components/overlays/ForceActionDialog";
+import { ChatDockBar } from "@/components/chat/ChatDockBar";
+import { ChatTimelineDrawer } from "@/components/chat/ChatTimelineDrawer";
 import type { GatewayWsClient } from "@/gateway/ws-client";
 import { useOfficeStore } from "@/store/office-store";
+import { useChatDockStore } from "@/store/console-stores/chat-dock-store";
 import { ActionBar } from "./ActionBar";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 
 interface AppShellProps {
-  children: ReactNode;
+  children?: ReactNode;
   wsClient?: RefObject<GatewayWsClient | null>;
   isMobile?: boolean;
 }
@@ -17,6 +21,13 @@ export function AppShell({ children, wsClient, isMobile = false }: AppShellProps
   const nullRef = { current: null } as RefObject<GatewayWsClient | null>;
   const sidebarCollapsed = useOfficeStore((s) => s.sidebarCollapsed);
   const setSidebarCollapsed = useOfficeStore((s) => s.setSidebarCollapsed);
+  const chatDockHeight = useOfficeStore((s) => s.chatDockHeight);
+  const setChatDockHeight = useOfficeStore((s) => s.setChatDockHeight);
+
+  const initEventListeners = useChatDockStore((s) => s.initEventListeners);
+  const setTargetAgent = useChatDockStore((s) => s.setTargetAgent);
+  const connectionStatus = useOfficeStore((s) => s.connectionStatus);
+  const agents = useOfficeStore((s) => s.agents);
 
   useEffect(() => {
     if (isMobile) {
@@ -24,13 +35,41 @@ export function AppShell({ children, wsClient, isMobile = false }: AppShellProps
     }
   }, [isMobile, setSidebarCollapsed]);
 
+  // Init chat event listeners when connected
+  useEffect(() => {
+    if (connectionStatus !== "connected") return;
+    const client = wsClient?.current ?? null;
+    if (!client) return;
+    const unsub = initEventListeners(client);
+    return unsub;
+  }, [connectionStatus, wsClient, initEventListeners]);
+
+  // Set default target agent to main agent on connection
+  useEffect(() => {
+    if (connectionStatus === "connected" && agents.size > 0) {
+      const currentTarget = useChatDockStore.getState().targetAgentId;
+      if (!currentTarget) {
+        const mainAgent = Array.from(agents.values()).find((a) => !a.isSubAgent);
+        if (mainAgent) {
+          setTargetAgent(mainAgent.id);
+        }
+      }
+    }
+  }, [connectionStatus, agents, setTargetAgent]);
+
+  const content = children ?? <Outlet />;
+
   return (
     <div className="flex h-screen w-screen flex-col bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
       <TopBar isMobile={isMobile} />
       <div className="relative flex flex-1 overflow-hidden">
-        <main className="relative flex-1 overflow-hidden">
-          {children}
-          <ActionBar wsClient={wsClient ?? nullRef} />
+        <main className="relative flex flex-1 flex-col overflow-hidden">
+          <div className="relative flex-1 overflow-hidden">
+            {content}
+            <ActionBar wsClient={wsClient ?? nullRef} />
+          </div>
+          <ChatTimelineDrawer height={chatDockHeight} onHeightChange={setChatDockHeight} />
+          <ChatDockBar />
         </main>
         {isMobile ? (
           <>
@@ -40,7 +79,7 @@ export function AppShell({ children, wsClient, isMobile = false }: AppShellProps
               className="fixed bottom-0 left-1/2 z-20 flex h-10 w-full max-w-xs -translate-x-1/2 items-center justify-center border-t border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
               aria-label={sidebarCollapsed ? "展开侧栏" : "收起侧栏"}
             >
-                    <div className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
+              <div className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
             </button>
             {!sidebarCollapsed && (
               <>

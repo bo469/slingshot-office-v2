@@ -85,12 +85,50 @@ pnpm typecheck
 
 前端通过 WebSocket 连接 Gateway（默认 `ws://localhost:18789`）。
 
-### 认证流程
+### 认证架构
 
-1. 建立 WebSocket 连接
+本项目是纯 Web 应用，默认在浏览器中无法使用 Ed25519（Chrome 默认不支持），因此通过 Gateway token + `dangerouslyDisableDeviceAuth` 配置绕过 device identity 要求
+
+前端以 `openclaw-control-ui` 身份连接 Gateway，请求 `operator.admin` scope。
+
+### 认证前提配置（必须）
+
+连接真实 Gateway 进行 Chat 等写操作（`chat.send`、`chat.abort` 等）前，必须完成以下配置：
+
+**1. 获取 Gateway token 并写入 `.env.local`：**
+
+```bash
+# 查看当前 Gateway token
+openclaw config get gateway.auth.token
+
+# 创建 .env.local（已在 .gitignore 中，不会被提交）
+cat > .env.local << 'EOF'
+VITE_GATEWAY_URL=ws://localhost:18789
+VITE_GATEWAY_TOKEN=<粘贴上面获取的 token>
+EOF
+```
+
+**2. 启用 Gateway 的 Control UI device auth bypass：**
+
+Gateway 2026.2.15+ 默认要求签名的 device identity 来授予 operator scopes。Web 客户端无法提供 device identity，需要配置 bypass：
+
+```bash
+openclaw config set gateway.controlUi.dangerouslyDisableDeviceAuth true
+```
+
+配置后需**重启 Gateway**使其生效。
+
+**3. 确保 Gateway 正在运行：**
+
+本项目不负责启动/停止 Gateway。请确保 OpenClaw Gateway 已在 `localhost:18789` 上运行（通过 macOS app、`openclaw gateway run` 或其他方式）。
+
+### 认证流程（协议级别）
+
+1. 建立 WebSocket 连接到 `ws://localhost:18789`
 2. Gateway 发送 `connect.challenge`（含 nonce）
-3. 前端发送 `connect` 请求，包含 client info 和 auth token
-4. Gateway 返回 `connect.accepted`
+3. 前端发送 `connect` 请求，包含 `client.id: "openclaw-control-ui"`、`scopes: ["operator.admin"]` 和 `auth.token`
+4. Gateway 验证 token，因 `dangerouslyDisableDeviceAuth=true` 跳过 device identity 检查，保留请求的 scopes
+5. Gateway 返回 `hello-ok` 响应
 
 ### 事件订阅
 
@@ -116,6 +154,23 @@ type AgentEventPayload = {
 };
 ```
 
+### Chat 协议
+
+Chat 功能通过以下 RPC 方法和事件实现：
+
+| 方法/事件 | 方向 | 所需 scope | 说明 |
+|-----------|------|-----------|------|
+| `chat.send` | RPC 请求 | `operator.write` | 发送消息，参数：`{ sessionKey, message, deliver: false, idempotencyKey }` |
+| `chat.abort` | RPC 请求 | `operator.write` | 中止当前 run，参数：`{ sessionKey }` |
+| `chat.history` | RPC 请求 | `operator.read` | 获取历史消息，参数：`{ sessionKey }` |
+| `chat` | 事件（Gateway → 客户端） | — | 流式事件，payload 含 `{ state, runId, message }` |
+
+Chat 事件的 `state` 取值：
+- `delta` — 流式增量，`message` 是累积对象（非增量文本）
+- `final` — 完成，`message` 是最终完整消息
+- `error` — 错误，`errorMessage` 含错误信息
+- `aborted` — 用户中止
+
 ### RPC 方法
 
 通过 WebSocket 调用：
@@ -124,6 +179,9 @@ type AgentEventPayload = {
 - `sessions.list` — 获取会话列表
 - `usage.status` — 获取用量统计
 - `tools.catalog` — 获取工具目录
+- `chat.send` — 发送 Chat 消息
+- `chat.abort` — 中止 Chat 会话
+- `chat.history` — 获取 Chat 历史
 
 ### 关键参考文件（OpenClaw 主项目）
 
@@ -155,16 +213,6 @@ type AgentEventPayload = {
 
 设置环境变量 `VITE_MOCK=true` 可在不连接 Gateway 的情况下使用模拟数据开发。Mock provider 位于 `src/gateway/mock-provider.ts`。
 
-## 分阶段开发顺序
-
-**严格按以下顺序执行，每个 Milestone 验收通过后再进入下一个：**
-
-1. **Phase 1（Week 1-2）：** 项目脚手架 → WS 客户端 → Zustand Store → 2D SVG 平面图 → 面板系统
-2. **Phase 2（Week 3-4）：** R3F 基础场景 → Agent 角色系统 → Sub-Agent 可视化 → 会议区
-3. **Phase 3（Week 5-6）：** 视觉增强 → Force Action → 监控图表 → 性能优化
-
-详细的 Milestone 任务表和验收标准见 `openspec/project.md`。
-
 ## 测试要求
 
 - `store/` 和 `gateway/event-parser.ts` **必须**有单元测试
@@ -174,5 +222,4 @@ type AgentEventPayload = {
 ## Git 约定
 
 - 提交信息使用 Conventional Commits 格式（中英均可）
-- 每个 Milestone 结束时做一次 tag（如 `v0.1.0-phase1`）
 - 不提交 `.env` 文件、node_modules、dist 目录

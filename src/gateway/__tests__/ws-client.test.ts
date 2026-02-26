@@ -97,7 +97,7 @@ describe("GatewayWsClient", () => {
     const req = JSON.parse(ws.sent[0]);
     expect(req.type).toBe("req");
     expect(req.method).toBe("connect");
-    expect(req.params.client.id).toBe("webchat-ui");
+    expect(req.params.client.id).toBe("openclaw-control-ui");
     expect(req.params.auth.token).toBe("test-token");
   });
 

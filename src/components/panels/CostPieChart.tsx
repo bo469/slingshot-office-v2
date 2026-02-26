@@ -21,7 +21,7 @@ export function CostPieChart() {
 
   if (entries.length === 0) {
     return (
-      <div className="flex h-48 items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex h-24 items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         暂无成本数据
       </div>
     );

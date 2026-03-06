@@ -14,6 +14,15 @@
       "gatewayDisconnected": "Gateway disconnected, data may not be up to date",
       "channelErrors": "{{count}} channel(s) with errors"
     },
+    "connectionGuide": {
+      "title": "Cannot connect to Gateway",
+      "subtitle": "Please check the following",
+      "reconnecting": "Attempting to reconnect...",
+      "step1": "Make sure OpenClaw Gateway is running (default port 18789)",
+      "step2": "Verify the Gateway token is configured (use --token flag or install openclaw CLI for auto-detection)",
+      "step3": "If Gateway is on another host, use --gateway ws://host:port",
+      "cmdComment": "Example: start with token"
+    },
     "quickNav": {
       "title": "Quick Navigation"
     },

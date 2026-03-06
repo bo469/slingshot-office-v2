@@ -1,3 +1,4 @@
+import { uuid } from "@/lib/uuid";
 import type { GatewayAdapter, AdapterEventHandler, SkillUpdatePatch } from "./adapter";
 import type {
   AgentCreateParams,
@@ -86,7 +87,7 @@ export class WsAdapter implements GatewayAdapter {
       sessionKey: params.sessionKey,
       message: params.text,
       deliver: false,
-      idempotencyKey: crypto.randomUUID(),
+      idempotencyKey: uuid(),
     });
   }
 

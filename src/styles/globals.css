@@ -1,8 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ============================================================
+   TAPTICO / SLINGSHOT DESIGN TOKENS
+   ============================================================ */
 :root {
+  /* Taptico brand colors */
+  --taptico-black: #000000;
+  --taptico-charcoal: #121212;
+  --taptico-surface: #1a1a1a;
+  --taptico-blue: #0066FF;
+  --taptico-blue-light: #3385ff;
+  --taptico-blue-dim: #0044cc;
+  --taptico-white: #FFFFFF;
+  --taptico-slate: #8A94A6;
+  --taptico-border: #2a2a2a;
+
+  /* Zone colors - light mode (kept for compatibility, rarely used) */
   --zone-desk: #e8edf5;
   --zone-meeting: #e0eaf5;
   --zone-hotDesk: #e5e8f0;
@@ -12,140 +28,190 @@
   --dot-tooltip-bg: white;
   --dot-tooltip-stroke: #d1d5db;
   --dot-tooltip-text: #374151;
-  --svg-link-color: #60a5fa;
+  --svg-link-color: #0066FF;
+
+  /* Typography */
+  --font-headline: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Border radius */
+  --radius-card: 12px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
 }
 
 .dark {
-  --zone-desk: #1e293b;
-  --zone-meeting: #1a2744;
-  --zone-hotDesk: #1e2433;
-  --zone-lounge: #231e33;
-  --zone-stroke: #334155;
-  --zone-label: #94a3b8;
-  --dot-tooltip-bg: #1e293b;
-  --dot-tooltip-stroke: #475569;
-  --dot-tooltip-text: #e2e8f0;
-  --svg-link-color: #60a5fa;
+  /* Override zone colors to Taptico dark theme */
+  --zone-desk: #0d1117;
+  --zone-meeting: #0a1628;
+  --zone-hotDesk: #0f1420;
+  --zone-lounge: #0d1020;
+  --zone-stroke: #1e2840;
+  --zone-label: var(--taptico-slate);
+  --dot-tooltip-bg: var(--taptico-charcoal);
+  --dot-tooltip-stroke: #2a2a2a;
+  --dot-tooltip-text: var(--taptico-white);
+  --svg-link-color: var(--taptico-blue);
 }
 
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
+html, body, #root {
+  background-color: #000000;
+  color: #FFFFFF;
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6,
+.font-headline {
+  font-family: var(--font-headline);
+}
+
+/* Force dark mode always for Slingshot */
+html {
+  color-scheme: dark;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
 @keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 @keyframes dash-flow {
-  to {
-    stroke-dashoffset: -20;
-  }
+  to { stroke-dashoffset: -20; }
 }
 
-/* Agent 状态动画 */
 @keyframes agent-pulse {
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
 }
 
 @keyframes agent-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 4px currentColor;
-  }
-  50% {
-    box-shadow: 0 0 14px currentColor;
-  }
+  0%, 100% { box-shadow: 0 0 4px currentColor; }
+  50% { box-shadow: 0 0 14px currentColor; }
 }
 
 @keyframes agent-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.35;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 @keyframes agent-spawn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 @keyframes agent-despawn {
-  from {
-    transform: scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: scale(0);
-    opacity: 0;
-  }
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0); opacity: 0; }
 }
 
 @keyframes thinking-dots {
-  0%,
-  80%,
-  100% {
-    opacity: 0.3;
-  }
-  40% {
-    opacity: 1;
-  }
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
 }
 
 @keyframes connection-pulse {
-  0% {
-    stroke-dashoffset: 24;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
 }
 
-/* Chat dialog slide animations */
 @keyframes chat-slide-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes chat-slide-down {
-  from {
-    transform: translateY(0);
-    opacity: 1;
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes electric-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(0, 102, 255, 0); }
+}
+
+@keyframes slingshot-glow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(0, 102, 255, 0.5);
   }
-  to {
-    transform: translateY(100%);
-    opacity: 0;
+  50% {
+    text-shadow: 0 0 20px rgba(0, 102, 255, 0.9), 0 0 40px rgba(0, 102, 255, 0.4);
   }
 }
 
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
 .animate-slide-up {
   animation: chat-slide-up 200ms ease-out forwards;
 }
 
 .animate-slide-down {
   animation: chat-slide-down 150ms ease-in forwards;
+}
+
+.animate-electric-pulse {
+  animation: electric-pulse 2s ease-in-out infinite;
+}
+
+.animate-slingshot-glow {
+  animation: slingshot-glow 3s ease-in-out infinite;
+}
+
+/* ============================================================
+   TAPTICO CARD COMPONENT
+   ============================================================ */
+.taptico-card {
+  background: var(--taptico-charcoal);
+  border: 1px solid var(--taptico-border);
+  border-radius: var(--radius-card);
+}
+
+.taptico-card-hover:hover {
+  border-color: var(--taptico-blue);
+  box-shadow: 0 0 0 1px var(--taptico-blue), 0 4px 24px rgba(0, 102, 255, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* ============================================================
+   STATUS INDICATOR COLORS
+   ============================================================ */
+.status-working { color: var(--taptico-blue); }
+.status-idle { color: var(--taptico-slate); }
+.status-meeting { color: #10b981; }
+.status-error { color: #ef4444; }
+.status-thinking { color: #f59e0b; }
+
+/* Department badge colors */
+.dept-leadership { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.4); }
+.dept-sales { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+.dept-research { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+.dept-content { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+.dept-operations { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+.dept-engineering { background: rgba(0, 102, 255, 0.2); color: #3385ff; border: 1px solid rgba(0, 102, 255, 0.4); }
+.dept-security { background: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.4); }
+.dept-client-success { background: rgba(20, 184, 166, 0.2); color: #2dd4bf; border: 1px solid rgba(20, 184, 166, 0.4); }
+.dept-seo { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+.dept-specialized { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
+
+/* Activity feed ticker */
+.activity-ticker {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.activity-ticker-inner {
+  display: inline-flex;
+  animation: ticker-scroll 30s linear infinite;
 }

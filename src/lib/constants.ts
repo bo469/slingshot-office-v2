@@ -49,30 +49,30 @@ export const ZONE_COLORS = {
 } as const;
 
 export const ZONE_COLORS_DARK = {
-  desk: "#1e293b",
-  meeting: "#1a2744",
-  hotDesk: "#1e2433",
-  lounge: "#231e33",
-  corridor: "#0f172a",
-  wall: "#475569",
+  desk: "#0d1117",
+  meeting: "#080e1a",
+  hotDesk: "#0a0d14",
+  lounge: "#0d0a18",
+  corridor: "#050508",
+  wall: "#1e2840",
 } as const;
 
 export const STATUS_COLORS: Record<AgentVisualStatus, string> = {
-  idle: "#22c55e",
-  thinking: "#3b82f6",
-  tool_calling: "#f97316",
-  speaking: "#a855f7",
+  idle: "#10b981",
+  thinking: "#0066FF",
+  tool_calling: "#f59e0b",
+  speaking: "#8b5cf6",
   spawning: "#06b6d4",
   error: "#ef4444",
-  offline: "#6b7280",
+  offline: "#8A94A6",
 };
 
 export const STATUS_LABELS: Record<AgentVisualStatus, string> = {
-  idle: "空闲",
-  thinking: "思考中",
-  tool_calling: "工具调用",
-  speaking: "回复中",
-  spawning: "创建中",
+  idle: "Idle",
+  thinking: "Thinking",
+  tool_calling: "Working",
+  speaking: "Responding",
+  spawning: "Spawning",
   error: "错误",
   offline: "离线",
 };

@@ -1,29 +1,26 @@
 {
-  "name": "@ww-ai-lab/openclaw-office",
+  "name": "@taptico/slingshot-office",
   "version": "2026.3.8-1",
-  "description": "Visual monitoring & management frontend for OpenClaw Multi-Agent system",
+  "description": "Slingshot Office — Visual command center for the Slingshot Squad at Taptico Solutions",
   "keywords": [
+    "slingshot",
+    "taptico",
     "ai-agents",
     "dashboard",
-    "monitoring",
-    "multi-agent",
     "office",
-    "openclaw",
-    "react",
-    "visualization",
-    "vite"
+    "visualization"
   ],
-  "homepage": "https://github.com/WW-AI-Lab/openclaw-office",
+  "homepage": "https://github.com/bo469/slingshot-office-v2",
   "bugs": {
-    "url": "https://github.com/WW-AI-Lab/openclaw-office/issues"
+    "url": "https://github.com/bo469/slingshot-office-v2/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WW-AI-Lab/openclaw-office.git"
+    "url": "git+https://github.com/bo469/slingshot-office-v2.git"
   },
   "bin": {
-    "openclaw-office": "bin/openclaw-office.js"
+    "slingshot-office": "bin/openclaw-office.js"
   },
   "files": [
     "dist/",
@@ -68,6 +65,7 @@
     "@tailwindcss/vite": "^4.1.0",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.3.0",
+    "@types/node": "^25.5.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@types/three": "^0.183.1",

@@ -65,7 +65,7 @@ export function AppShell({ children, wsClient, isMobile = false }: AppShellProps
         currentTarget != null && eligibleAgents.some((agent) => agent.id === currentTarget);
 
       if (!hasValidTarget) {
-        const mainAgent = eligibleAgents.find((agent) => agent.id === "main") ?? eligibleAgents[0];
+        const mainAgent = eligibleAgents.find((agent) => agent.id === "bo") ?? eligibleAgents[0];
         setTargetAgent(mainAgent.id);
       }
     }
@@ -89,7 +89,7 @@ export function AppShell({ children, wsClient, isMobile = false }: AppShellProps
   const content = children ?? <Outlet />;
 
   return (
-    <div className="flex h-screen w-screen flex-col bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div className="flex h-screen w-screen flex-col" style={{ background: "#000000", color: "#FFFFFF", fontFamily: "Inter, sans-serif" }}>
       <RestartBanner />
       <TopBar isMobile={isMobile} />
       <ToastContainer />

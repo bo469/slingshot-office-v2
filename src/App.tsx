@@ -25,9 +25,9 @@ const Scene3D = lazy(() => import("@/components/office-3d/Scene3D"));
 function Scene3DFallback() {
   const { t } = useTranslation("office");
   return (
-    <div className="flex h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-950">
+    <div className="flex h-full w-full items-center justify-center" style={{ background: "#000000" }}>
       <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: "#0066FF", borderTopColor: "transparent" }} />
         <span className="text-sm text-gray-500 dark:text-gray-400">{t("loading3D")}</span>
       </div>
     </div>
@@ -83,10 +83,10 @@ function ThemeSync() {
 
 function ConnectionBootstrap({ message }: { message: string }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#e0f2fe,transparent_35%),linear-gradient(180deg,#f8fafc_0%,#e2e8f0_100%)] px-6 dark:bg-[radial-gradient(circle_at_top,#082f49,transparent_35%),linear-gradient(180deg,#020617_0%,#0f172a_100%)]">
-      <div className="flex w-full max-w-md flex-col items-center rounded-3xl border border-white/60 bg-white/80 px-8 py-10 text-center shadow-2xl backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/80">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-        <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">{message}</p>
+    <div className="flex min-h-screen items-center justify-center px-6" style={{ background: "#000000" }}>
+      <div className="flex w-full max-w-md flex-col items-center rounded-xl border px-8 py-10 text-center shadow-2xl" style={{ background: "#121212", borderColor: "#1e1e1e", borderRadius: "12px" }}>
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: "#0066FF", borderTopColor: "transparent" }} />
+        <p className="mt-4 text-sm" style={{ color: "#8A94A6" }}>{message}</p>
       </div>
     </div>
   );

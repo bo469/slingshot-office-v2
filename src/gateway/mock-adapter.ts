@@ -1,3 +1,4 @@
+import { SLINGSHOT_AGENTS, buildMockAgentsList, buildConfigAgentsList, A2A_WORKFLOWS, getRandomSpeechBubble } from "@/lib/slingshot-agents";
 import type { GatewayAdapter, AdapterEventHandler, SkillUpdatePatch } from "./adapter";
 import type {
   AgentCreateParams,
@@ -293,17 +294,12 @@ function mockConfigData(): Record<string, unknown> {
     },
     agents: {
       defaults: {
-        subagents: { maxConcurrent: 12, maxSpawnDepth: 2 },
+        subagents: { maxConcurrent: 20, maxSpawnDepth: 3 },
       },
-      list: [
-        { id: "main", model: "anthropic/claude-sonnet-4-20250514" },
-        { id: "ai-researcher", model: "anthropic/claude-opus-4-20250514" },
-        { id: "coder", model: "anthropic/claude-sonnet-4-20250514" },
-        { id: "ecommerce", model: "openai/gpt-4o" },
-      ],
+      list: buildConfigAgentsList(),
     },
     tools: {
-      agentToAgent: { enabled: true, allow: ["main", "coder", "ai-researcher", "ecommerce"] },
+      agentToAgent: { enabled: true, allow: SLINGSHOT_AGENTS.map((a) => a.id) },
     },
     update: { channel: "stable" },
     gateway: { auth: { token: REDACTED } },
@@ -382,7 +378,10 @@ class SubAgentSimulator {
 
   private spawnSubAgent(): void {
     this.subCounter++;
-    const subId = `mock-sub-${this.subCounter}`;
+    // Pick a random Slingshot agent as the spawned sub-agent
+    const agentIdx = Math.floor(Math.random() * SLINGSHOT_AGENTS.length);
+    const spawnAgent = SLINGSHOT_AGENTS[agentIdx];
+    const subId = spawnAgent.id;
     const runId = `mock-run-sub-${this.subCounter}`;
     const sessionKey = `mock-session-sub-${this.subCounter}`;
 
@@ -394,11 +393,11 @@ class SubAgentSimulator {
       seq: 1,
       stream: "lifecycle",
       ts: Date.now(),
-      data: { phase: "start", agentId: subId, parentAgentId: "main" },
+      data: { phase: "start", agentId: subId, parentAgentId: "bo" },
       sessionKey,
     });
 
-    // thinking phase
+    // thinking phase with Slingshot speech bubble
     this.schedule(() => {
       if (!this.running) return;
       this.emit("agent", {
@@ -406,7 +405,7 @@ class SubAgentSimulator {
         seq: 2,
         stream: "assistant",
         ts: Date.now(),
-        data: { text: `Sub-agent ${subId} 正在分析任务...` },
+        data: { text: getRandomSpeechBubble(subId) },
         sessionKey,
       });
     }, randRange(1000, 2000));
@@ -414,7 +413,7 @@ class SubAgentSimulator {
     // tool calling phase
     this.schedule(() => {
       if (!this.running) return;
-      const tools = ["web_search", "code_exec", "file_read", "analyze_data"];
+      const tools = ["web_search", "exec", "read", "write", "browser", "message", "memory_recall"];
       const tool = tools[Math.floor(Math.random() * tools.length)];
       this.emit("agent", {
         runId,
@@ -426,15 +425,23 @@ class SubAgentSimulator {
       });
     }, randRange(3000, 5000));
 
-    // speaking phase
+    // speaking phase - completion
     this.schedule(() => {
       if (!this.running) return;
+      const completionMessages = [
+        "Task complete. Handing off.",
+        "Done. Results sent to Bo.",
+        "Finished. Quality checked.",
+        "Complete. Moving to next item.",
+        "All done. Awaiting next task.",
+      ];
+      const msg = completionMessages[Math.floor(Math.random() * completionMessages.length)];
       this.emit("agent", {
         runId,
         seq: 4,
         stream: "assistant",
         ts: Date.now(),
-        data: { text: `Sub-agent ${subId} 已完成任务分析。` },
+        data: { text: msg },
         sessionKey,
       });
     }, randRange(6000, 9000));
@@ -458,10 +465,8 @@ class SubAgentSimulator {
   private scheduleAgentToAgentComm(delayMs: number): void {
     this.schedule(() => {
       if (!this.running) return;
-      const agents = ["main", "coder", "ai-researcher", "ecommerce"];
-      const a = agents[Math.floor(Math.random() * agents.length)];
-      let b = a;
-      while (b === a) b = agents[Math.floor(Math.random() * agents.length)];
+      const pairs = A2A_WORKFLOWS;
+      const [a, b] = pairs[Math.floor(Math.random() * pairs.length)];
 
       const sessionKey = `a2a-${Date.now()}`;
       const runIdA = `a2a-run-${a}-${Date.now()}`;
@@ -576,14 +581,14 @@ export class MockAdapter implements GatewayAdapter {
       {
         id: "msg-hist-1",
         role: "user",
-        content: "你好，请介绍一下 OpenClaw",
+        content: "Give me a status update on the squad.",
         timestamp: Date.now() - 120_000,
       },
       {
         id: "msg-hist-2",
         role: "assistant",
         content:
-          "**OpenClaw** 是一个多 Agent 协作系统，支持：\n\n- 多渠道消息接入（Telegram、Discord、WhatsApp 等）\n- 工具调用和技能扩展\n- 定时任务调度\n- 实时可视化监控\n\n你可以通过 OpenClaw Office 观察 Agent 的协作行为。",
+          "**Slingshot Squad Status** 🎯\n\n**Active:** 14 agents currently on tasks\n\n- **Sales:** Vince has 3 closes in the pipeline, Maverick's campaign is at 8.3% reply rate\n- **Research:** Iris completed the competitive landscape report\n- **Content:** Scribe finished two proposals — both passed Lucy's QA gate\n- **Engineering:** Ada reports 99.97% uptime. No incidents.\n- **Security:** Cipher rotated all secrets on schedule\n\nEverything is green. The Slingshot is working.",
         timestamp: Date.now() - 110_000,
       },
     ];
@@ -591,7 +596,14 @@ export class MockAdapter implements GatewayAdapter {
 
   async chatSend(params: ChatSendParams): Promise<void> {
     const runId = `mock-run-${Date.now()}`;
-    const responseText = `收到你的消息：「${params.text}」\n\n这是 Mock 模式下的模拟回复。在连接真实 Gateway 后，这里将显示 Agent 的实际响应。`;
+    // Build a Slingshot-flavored response
+    const responses = [
+      `Got it. **Bo** is routing "${params.text}" to the right agent now.\n\nThe Slingshot Squad is on it.`,
+      `Task received: _"${params.text}"_\n\n**Oracle** is analyzing the request. Expect a strategic brief within minutes.`,
+      `**Scribe** is drafting a response to: "${params.text}"\n\nPassing through **Lucy's** QA gate before delivery.`,
+      `Routing to **Iris** for research on: "${params.text}"\n\nResults will be synthesized and delivered to your channel.`,
+    ];
+    const responseText = responses[Math.floor(Math.random() * responses.length)];
 
     // Simulate Gateway chat events: delta → delta → final
     this.scheduleTimer(() => {
@@ -654,20 +666,28 @@ export class MockAdapter implements GatewayAdapter {
   async sessionsList(): Promise<SessionInfo[]> {
     return [
       {
-        key: "agent:main:main",
-        agentId: "main",
-        label: "默认会话",
+        key: "agent:bo:main",
+        agentId: "bo",
+        label: "Main Operations",
         createdAt: Date.now() - 3600_000,
         lastActiveAt: Date.now(),
-        messageCount: 12,
+        messageCount: 47,
       },
       {
-        key: "agent:main:feishu:direct:test-user",
-        agentId: "main",
-        label: "飞书会话",
+        key: "agent:oracle:strategy",
+        agentId: "oracle",
+        label: "Strategy Session",
         createdAt: Date.now() - 1800_000,
         lastActiveAt: Date.now() - 60_000,
-        messageCount: 8,
+        messageCount: 23,
+      },
+      {
+        key: "agent:vince:discord:sales",
+        agentId: "vince",
+        label: "Sales Channel",
+        createdAt: Date.now() - 900_000,
+        lastActiveAt: Date.now() - 300_000,
+        messageCount: 15,
       },
     ];
   }
@@ -753,21 +773,7 @@ export class MockAdapter implements GatewayAdapter {
   async cronRun(_id: string): Promise<void> {}
 
   async agentsList(): Promise<AgentsListResponse> {
-    return {
-      defaultId: "main",
-      mainKey: "agent:main:main",
-      scope: "global",
-      agents: [
-        { id: "main", name: "main", default: true, identity: { name: "main", emoji: "m" } },
-        {
-          id: "ai-researcher",
-          name: "ResearchClaw",
-          identity: { name: "ResearchClaw", emoji: "🔬" },
-        },
-        { id: "coder", name: "CodeClaw", identity: { name: "CodeClaw", emoji: "💻" } },
-        { id: "ecommerce", name: "TradeClaw", identity: { name: "TradeClaw", emoji: "🛒" } },
-      ],
-    };
+    return buildMockAgentsList();
   }
 
   async agentsCreate(params: AgentCreateParams): Promise<AgentCreateResult> {

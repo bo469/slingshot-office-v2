@@ -41,7 +41,7 @@ export function TopBar({ isMobile = false }: TopBarProps) {
   const isOfficePage = currentPage === "office";
 
   return (
-    <header className="flex h-12 shrink-0 items-center border-b border-gray-200 bg-white px-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+    <header className="flex h-12 shrink-0 items-center border-b px-4" style={{ background: "#000000", borderColor: "#1e1e1e" }}>
       {isOfficePage ? (
         <OfficeTopBarContent
           viewMode={viewMode}
@@ -85,8 +85,8 @@ function OfficeTopBarContent({
   return (
     <>
       <div className="flex items-center gap-3">
-        <h1 className="text-lg font-semibold tracking-tight text-gray-800 dark:text-gray-100">
-          OpenClaw Office
+        <h1 className="text-lg font-semibold tracking-tight" style={{ fontFamily: "Space Grotesk, sans-serif", color: "#FFFFFF" }}>
+          🎯 Slingshot Office
         </h1>
         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
           v{APP_VERSION}
@@ -216,11 +216,12 @@ function ViewModeSwitch({
             title={title}
             className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
               isActive
-                ? "bg-blue-600 text-white shadow-sm"
+                ? "text-white shadow-sm"
                 : disabled
                   ? "cursor-not-allowed text-gray-300 dark:text-gray-600"
                   : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
             }`}
+            style={isActive ? { background: "#0066FF" } : undefined}
           >
             {label}
           </button>

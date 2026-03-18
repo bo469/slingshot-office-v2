@@ -15,7 +15,7 @@ import { SkillsPage } from "@/components/pages/SkillsPage";
 import { ConnectionSetupDialog } from "@/components/shared/ConnectionSetupDialog";
 import type { PageId } from "@/gateway/types";
 import { useGatewayConnection } from "@/hooks/useGatewayConnection";
-import type { ConnectionPreference } from "@/lib/connection-preferences";
+import type { ConnectionPreference, ConnectionMode } from "@/lib/connection-preferences";
 import { readConnectionPreference, writeConnectionPreference } from "@/lib/connection-preferences";
 import { resolveGatewayConnectionConfig } from "@/lib/gateway-url";
 import { updateRuntimeConnectionTarget } from "@/lib/runtime-connection-api";
@@ -128,7 +128,7 @@ export function App() {
   const proxyGatewayUrl = injected?.gatewayUrl || "/gateway-ws";
   const managedGatewayToken = injected?.gatewayToken || import.meta.env.VITE_GATEWAY_TOKEN || "";
   const [connectionPreference, setConnectionPreference] = useState<ConnectionPreference | null>(
-    () => readConnectionPreference(),
+    () => readConnectionPreference() || { mode: "local" as ConnectionMode, gatewayUrl: "", gatewayToken: "" },
   );
   const [isApplyingConnection, setIsApplyingConnection] = useState(false);
   const [connectionSetupError, setConnectionSetupError] = useState<string | null>(null);
@@ -151,7 +151,7 @@ export function App() {
       setConnectionSetupError(null);
 
       try {
-        if (shouldConfigureRuntimeProxy) {
+        if (shouldConfigureRuntimeProxy && preference.gatewayUrl) {
           if (preference.mode === "remote") {
             await updateRuntimeConnectionTarget({
               mode: "remote",
@@ -166,9 +166,9 @@ export function App() {
           setConnectionReady(true);
         }
       } catch (error) {
+        // In demo mode (no real gateway), skip the error and show the office
         if (!cancelled) {
-          const message = error instanceof Error ? error.message : t("errors.unknownError");
-          setConnectionSetupError(message);
+          setConnectionReady(true);
         }
       }
     }

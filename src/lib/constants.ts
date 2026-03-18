@@ -21,10 +21,10 @@ const rightX = OFFICE.x + halfW + OFFICE.corridorWidth;
 const bottomY = OFFICE.y + halfH + OFFICE.corridorWidth;
 
 export const ZONES = {
-  desk: { x: OFFICE.x, y: OFFICE.y, width: halfW, height: halfH, label: "固定工位区" },
-  meeting: { x: rightX, y: OFFICE.y, width: halfW, height: halfH, label: "会议区" },
-  hotDesk: { x: OFFICE.x, y: bottomY, width: halfW, height: halfH, label: "热工位区" },
-  lounge: { x: rightX, y: bottomY, width: halfW, height: halfH, label: "休息区" },
+  desk: { x: OFFICE.x, y: OFFICE.y, width: halfW, height: halfH, label: "Command Center" },
+  meeting: { x: rightX, y: OFFICE.y, width: halfW, height: halfH, label: "War Room" },
+  hotDesk: { x: OFFICE.x, y: bottomY, width: halfW, height: halfH, label: "Research Lab" },
+  lounge: { x: rightX, y: bottomY, width: halfW, height: halfH, label: "Content Studio" },
 } as const;
 
 // Corridor entrance point: bottom center of the building (main entrance door)
@@ -49,12 +49,12 @@ export const ZONE_COLORS = {
 } as const;
 
 export const ZONE_COLORS_DARK = {
-  desk: "#0d1117",
-  meeting: "#080e1a",
-  hotDesk: "#0a0d14",
-  lounge: "#0d0a18",
+  desk: "#040b1a",      // Command Center — deep blue-black
+  meeting: "#0a0a14",   // War Room — near-black with purple
+  hotDesk: "#040e18",   // Research Lab — deep navy
+  lounge: "#0a0e0a",    // Content Studio — near-black with green tint
   corridor: "#050508",
-  wall: "#1e2840",
+  wall: "#0066FF",      // Electric Blue accent walls
 } as const;
 
 export const STATUS_COLORS: Record<AgentVisualStatus, string> = {

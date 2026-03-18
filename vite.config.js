@@ -148,7 +148,10 @@ async function readJsonBody(req) {
 export default defineConfig(({ mode }) => {
     const defaultGatewayTarget = resolveGatewayTarget(mode);
     let currentGatewayTarget = defaultGatewayTarget;
+    // Use subpath for GitHub Pages, root for Vercel/custom domains
+    const base = process.env.GITHUB_PAGES === "true" ? "/slingshot-office-v2/" : "/";
     return {
+        base,
         define: {
             __APP_VERSION__: JSON.stringify(pkg.version),
         },

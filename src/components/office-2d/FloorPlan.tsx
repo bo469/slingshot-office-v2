@@ -151,10 +151,15 @@ export function FloorPlan() {
         {/* ── Layer 4: Door openings (overlaid on partitions) ── */}
         <DoorOpenings isDark={isDark} />
 
-        {/* Zone labels */}
+        {/* Zone labels with department indicators */}
         {Object.entries(ZONES).map(([key, zone]) => (
           <ZoneLabel key={`label-${key}`} zone={zone} zoneKey={key as keyof typeof ZONES} />
         ))}
+        {/* Zone accent lines — Electric Blue branding */}
+        <line x1={ZONES.desk.x + 2} y1={ZONES.desk.y + 2} x2={ZONES.desk.x + 60} y2={ZONES.desk.y + 2} stroke="#0066FF" strokeWidth={2} opacity={0.6} />
+        <line x1={ZONES.meeting.x + 2} y1={ZONES.meeting.y + 2} x2={ZONES.meeting.x + 60} y2={ZONES.meeting.y + 2} stroke="#8b5cf6" strokeWidth={2} opacity={0.6} />
+        <line x1={ZONES.hotDesk.x + 2} y1={ZONES.hotDesk.y + 2} x2={ZONES.hotDesk.x + 60} y2={ZONES.hotDesk.y + 2} stroke="#3b82f6" strokeWidth={2} opacity={0.6} />
+        <line x1={ZONES.lounge.x + 2} y1={ZONES.lounge.y + 2} x2={ZONES.lounge.x + 60} y2={ZONES.lounge.y + 2} stroke="#f59e0b" strokeWidth={2} opacity={0.6} />
 
         {/* ── Layer 5: Furniture – Desk zone ── */}
         <DeskZoneFurniture deskSlots={deskSlots} deskAgents={deskAgents} />

@@ -4,6 +4,8 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { FloorPlan } from "@/components/office-2d/FloorPlan";
+import { SlingshotActivityFeed } from "@/components/shared/SlingshotActivityFeed";
+import { useWanderingAgents } from "@/hooks/useWanderingAgents";
 import { AgentsPage } from "@/components/pages/AgentsPage";
 import { ChannelsPage } from "@/components/pages/ChannelsPage";
 import { CronPage } from "@/components/pages/CronPage";
@@ -35,6 +37,7 @@ function Scene3DFallback() {
 }
 
 function OfficeView() {
+  useWanderingAgents();
   const viewMode = useOfficeStore((s) => s.viewMode);
   const [fading, setFading] = useState(false);
   const [displayMode, setDisplayMode] = useState(viewMode);
@@ -52,16 +55,19 @@ function OfficeView() {
 
   return (
     <div
-      className="h-full w-full transition-opacity duration-300"
+      className="flex flex-col h-full w-full transition-opacity duration-300"
       style={{ opacity: fading ? 0 : 1 }}
     >
-      {displayMode === "2d" ? (
-        <FloorPlan />
-      ) : (
-        <Suspense fallback={<Scene3DFallback />}>
-          <Scene3D />
-        </Suspense>
-      )}
+      <div className="flex-1 min-h-0">
+        {displayMode === "2d" ? (
+          <FloorPlan />
+        ) : (
+          <Suspense fallback={<Scene3DFallback />}>
+            <Scene3D />
+          </Suspense>
+        )}
+      </div>
+      <SlingshotActivityFeed />
     </div>
   );
 }

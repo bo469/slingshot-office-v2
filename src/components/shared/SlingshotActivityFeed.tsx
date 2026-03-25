@@ -11,8 +11,15 @@ interface ActivityItem {
   type: "working" | "completed" | "collaboration" | "tool" | "intel";
 }
 
-// 30+ Taptico-specific activity messages
+// Activity messages — pinned recent events first, then general Taptico activity
 const TAPTICO_ACTIVITY_MESSAGES: Array<{ message: string; type: ActivityItem["type"] }> = [
+  // ── PINNED RECENT ACTIVITY (March 24-25, 2026) ──────────────────────────
+  { message: "SBIR winner research complete — NSF AI Track strategy ready", type: "intel" as const },
+  { message: "Mission Control synced across all platforms", type: "completed" as const },
+  { message: "MEMORY.md trimmed 78% (19K→4K chars), model tiering implemented", type: "completed" as const },
+  { message: "CIG Copilot Studio agents deployed — Chuck's Executive Agent live", type: "completed" as const },
+  { message: "Discord token reset + OpenClaw updated to 2026.3.23-2", type: "completed" as const },
+  // ── STANDARD ACTIVITY MESSAGES ─────────────────────────────────────────
   { message: "Bo is reviewing the ZIPS outreach package", type: "working" },
   { message: "Iris is researching Mountain High Outfitters", type: "working" },
   { message: "Ada is building the Slingshot Office visualization", type: "working" },

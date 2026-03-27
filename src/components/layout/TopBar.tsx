@@ -86,7 +86,7 @@ function OfficeTopBarContent({
     <>
       <div className="flex items-center gap-3">
         <h1 className="text-lg font-semibold tracking-tight" style={{ fontFamily: "Space Grotesk, sans-serif", color: "#FFFFFF" }}>
-          🎯 Slingshot Office
+          ⚡ TapticoOS
         </h1>
         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
           v{APP_VERSION}
